@@ -19,7 +19,7 @@ class CartsController < ApplicationController
     render json: @cart, status: :created
   end
 
-  # POST /cart/add
+  # PATCH /cart/add
   def add_item
     new_quantity = (params[:quantity] || 1).to_i
 
