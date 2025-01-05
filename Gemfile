@@ -17,6 +17,7 @@ gem 'guard'
 gem 'guard-livereload', require: false
 
 group :development, :test do
+  gem 'active_model_serializers', '~> 0.10'
   gem 'debug', platforms: %i[mri windows]
   gem 'rspec-rails', '~> 6.1.0'
   gem 'rubocop', require: false
