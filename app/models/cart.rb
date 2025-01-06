@@ -4,14 +4,25 @@ class Cart < ApplicationRecord
 
   validates :total_price, numericality: { greater_than_or_equal_to: 0 }
 
-  # TODO: lógica para marcar o carrinho como abandonado e remover se abandonado
-
   enum :status, {
     open: 'open',
-    abndoned: 'abandoned',
+    abandoned: 'abandoned',
   }, default: 'open'
 
   before_validation :set_default_total_price, on: :create
+
+  def mark_as_abandoned
+    return if abandoned?
+    if last_interaction_at <= 3.hours.ago
+      update!(status: :abandoned)
+    end
+  end
+
+  def remove_if_abandoned
+    if abandoned? && last_interaction_at <= 7.days.ago
+      destroy
+    end
+  end
 
   private
 
