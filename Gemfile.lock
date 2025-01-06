@@ -105,6 +105,11 @@ GEM
     et-orbi (1.2.11)
       tzinfo
     eventmachine (1.2.7)
+    factory_bot (6.5.0)
+      activesupport (>= 5.0.0)
+    factory_bot_rails (6.4.4)
+      factory_bot (~> 6.5)
+      railties (>= 5.0.0)
     ffi (1.17.0-aarch64-linux-gnu)
     ffi (1.17.0-arm-linux-gnu)
     ffi (1.17.0-arm64-darwin)
@@ -292,6 +297,8 @@ GEM
     rufus-scheduler (3.9.1)
       fugit (~> 1.1, >= 1.1.6)
     shellany (0.0.1)
+    shoulda-matchers (6.4.0)
+      activesupport (>= 5.2.0)
     sidekiq (7.2.4)
       concurrent-ruby (< 2)
       connection_pool (>= 2.3.0)
@@ -328,6 +335,7 @@ DEPENDENCIES
   active_model_serializers (~> 0.10)
   bootsnap
   debug
+  factory_bot_rails (~> 6.2)
   guard
   guard-livereload
   pg (~> 1.1)
@@ -338,6 +346,7 @@ DEPENDENCIES
   rubocop
   rubocop-rails
   rubocop-rspec
+  shoulda-matchers (~> 6.0)
   sidekiq (~> 7.2, >= 7.2.4)
   sidekiq-scheduler (~> 5.0, >= 5.0.3)
   tzinfo-data

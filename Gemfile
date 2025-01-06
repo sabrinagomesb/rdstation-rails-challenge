@@ -19,8 +19,10 @@ gem 'guard-livereload', require: false
 group :development, :test do
   gem 'active_model_serializers', '~> 0.10'
   gem 'debug', platforms: %i[mri windows]
+  gem 'factory_bot_rails', '~> 6.2'
   gem 'rspec-rails', '~> 6.1.0'
   gem 'rubocop', require: false
   gem 'rubocop-rails', require: false
   gem 'rubocop-rspec', require: false
+  gem 'shoulda-matchers', '~> 6.0'
 end
