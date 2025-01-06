@@ -1,0 +1,4 @@
+cleanup_abandoned_carts:
+  cron: '0 * * * *'
+  class: CleanupAbandonedCartsWorker
+  queue: default
