@@ -1,108 +1,127 @@
-# Desafio técnico e-commerce
+# Desafio técnico e-commerce - Solução Implementada
 
-## Nossas expectativas
+## 📋 Sobre a Implementação
 
-A equipe de engenharia da RD Station tem alguns princípios nos quais baseamos nosso trabalho diário. Um deles é: projete seu código para ser mais fácil de entender, não mais fácil de escrever.
+Esta é a solução completa para o desafio técnico de e-commerce da RD Station, implementando uma API REST para gerenciamento de carrinho de compras com funcionalidades avançadas de limpeza automática de carrinhos abandonados.
 
-Portanto, para nós, é mais importante um código de fácil leitura do que um que utilize recursos complexos e/ou desnecessários.
+### ✨ Funcionalidades Implementadas
 
-O que gostaríamos de ver:
+- **API REST completa** com 3 endpoints para gerenciamento de carrinho e 1 endpoint extra para listar todos os produtos
+- **Sistema de carrinhos por sessão** com persistência automática
+- **Job automatizado** para limpeza de carrinhos abandonados (3h → abandonado, 7 dias → removido)
+- **Documentação Swagger/OpenAPI** interativa
+- **Testes abrangentes** com RSpec e FactoryBot
+- **Padronização de código** com RuboCop
+- **Dockerização completa** com docker-compose
 
-- O código deve ser fácil de ler. Clean Code pode te ajudar.
-- Notas gerais e informações sobre a versão da linguagem e outras informações importantes para executar seu código.
-- Código que se preocupa com a performance (complexidade de algoritmo).
-- O seu código deve cobrir todos os casos de uso presentes no README, mesmo que não haja um teste implementado para tal.
-- A adição de novos testes é sempre bem-vinda.
-- Você deve enviar para nós o link do repositório público com a aplicação desenvolvida (GitHub, BitBucket, etc.).
+### 🛠️ Melhorias Adicionais
 
-## O Desafio - Carrinho de compras
-O desafio consiste em uma API para gerenciamento do um carrinho de compras de e-commerce.
+- **Documentação Swagger**: Interface interativa disponível em `/api-docs`
+- **Tratamento de erros**: Validações robustas e mensagens de erro claras
+- **Padronização**: RuboCop configurado para manter consistência de código
+- **Serialização**: Active Model Serializers para respostas JSON estruturadas
+- **Jobs otimizados**: Sistema eficiente de limpeza de carrinhos abandonados
 
-Você deve desenvolver utilizando a linguagem Ruby e framework Rails, uma API Rest que terá 3 endpoins que deverão implementar as seguintes funcionalidades:
+## 🚀 Documentação da API
 
-### 1. Registrar um produto no carrinho
-Criar um endpoint para inserção de produtos no carrinho.
+### 📖 Swagger/OpenAPI Documentation
 
-Se não existir um carrinho para a sessão, criar o carrinho e salvar o ID do carrinho na sessão.
+A documentação interativa da API está disponível através do Swagger UI:
 
-Adicionar o produto no carrinho e devolver o payload com a lista de produtos do carrinho atual.
+- **URL**: `http://localhost:3000/api-docs`
+- **Arquivo YAML**: `http://localhost:3000/api-docs/v1/swagger.yaml`
 
+A documentação inclui todos os endpoints, schemas de request/response, exemplos e permite testar a API diretamente na interface.
 
-ROTA: `/cart`
-Payload:
-```js
+## 📋 Endpoints Implementados
+
+A API REST implementa 4 endpoints para gerenciamento completo do carrinho de compras:
+
+### 1. Adicionar produto ao carrinho
+
+**POST** `/cart`
+
+Adiciona um produto ao carrinho da sessão atual. Se não existir carrinho, cria um novo automaticamente.
+
+**Request Body:**
+
+```json
 {
-  "product_id": 345, // id do produto sendo adicionado
-  "quantity": 2, // quantidade de produto a ser adicionado
+  "product_id": 345,
+  "quantity": 2
 }
 ```
 
-Response
-```js
+**Response (201 Created):**
+
+```json
 {
-  "id": 789, // id do carrinho
+  "id": 789,
   "products": [
     {
       "id": 645,
       "name": "Nome do produto",
       "quantity": 2,
-      "unit_price": 1.99, // valor unitário do produto
-      "total_price": 3.98, // valor total do produto
-    },
-    {
-      "id": 646,
-      "name": "Nome do produto 2",
-      "quantity": 2,
       "unit_price": 1.99,
-      "total_price": 3.98,
-    },
+      "total_price": 3.98
+    }
   ],
-  "total_price": 7.96 // valor total no carrinho
+  "total_price": 7.96
 }
 ```
 
-### 2. Listar itens do carrinho atual
-Criar um endpoint para listar os produtos no carrinho atual.
+**Validações:**
 
-ROTA: `/cart`
+- `product_id` deve existir no banco de dados
+- `quantity` deve ser um número inteiro positivo
+- Produto duplicado incrementa a quantidade existente
 
-Response:
-```js
+### 2. Listar itens do carrinho
+
+**GET** `/cart`
+
+Retorna todos os produtos do carrinho da sessão atual.
+
+**Response (200 OK):**
+
+```json
 {
-  "id": 789, // id do carrinho
+  "id": 789,
   "products": [
     {
       "id": 645,
       "name": "Nome do produto",
       "quantity": 2,
-      "unit_price": 1.99, // valor unitário do produto
-      "total_price": 3.98, // valor total do produto
-    },
-    {
-      "id": 646,
-      "name": "Nome do produto 2",
-      "quantity": 2,
       "unit_price": 1.99,
-      "total_price": 3.98,
-    },
+      "total_price": 3.98
+    }
   ],
-  "total_price": 7.96 // valor total no carrinho
+  "total_price": 7.96
 }
 ```
 
-### 3. Alterar a quantidade de produtos no carrinho 
-Um carrinho pode ter _N_ produtos, se o produto já existir no carrinho, apenas a quantidade dele deve ser alterada
+**Comportamento:**
 
-ROTA: `/cart/add_item`
+- Retorna carrinho vazio se não houver produtos
+- Atualiza automaticamente o `last_interaction_at` do carrinho
 
-Payload
+### 3. Atualizar quantidade de produto
+
+**PATCH** `/cart/add_item`
+
+Atualiza a quantidade de um produto existente no carrinho.
+
+**Request Body:**
+
 ```json
 {
   "product_id": 1230,
-  "quantity": 1
+  "quantity": 5
 }
 ```
-Response:
+
+**Response (200 OK):**
+
 ```json
 {
   "id": 1,
@@ -110,109 +129,256 @@ Response:
     {
       "id": 1230,
       "name": "Nome do produto X",
-      "quantity": 2, // considerando que esse produto já estava no carrinho
-      "unit_price": 7.00, 
-      "total_price": 14.00, 
-    },
-    {
-      "id": 01020,
-      "name": "Nome do produto Y",
-      "quantity": 1,
-      "unit_price": 9.90, 
-      "total_price": 9.90, 
-    },
+      "quantity": 5,
+      "unit_price": 7.0,
+      "total_price": 35.0
+    }
   ],
-  "total_price": 23.9
+  "total_price": 35.0
 }
 ```
 
-### 3. Remover um produto do carrinho 
+**Validações:**
 
-Criar um endpoint para excluir um produto do do carrinho. 
+- Produto deve existir no carrinho
+- `quantity` deve ser um número inteiro positivo
+- Retorna erro 404 se produto não estiver no carrinho
 
-ROTA: `/cart/:product_id`
+### 4. Remover produto do carrinho
 
+**DELETE** `/cart/{product_id}`
 
-#### Detalhes adicionais:
+Remove um produto específico do carrinho.
 
-- Verifique se o produto existe no carrinho antes de tentar removê-lo.
-- Se o produto não estiver no carrinho, retorne uma mensagem de erro apropriada.
-- Após remover o produto, retorne o payload com a lista atualizada de produtos no carrinho.
-- Certifique-se de que o endpoint lida corretamente com casos em que o carrinho está vazio após a remoção do produto.
+**Response (200 OK):**
 
-### 5. Excluir carrinhos abandonados
-Um carrinho é considerado abandonado quando estiver sem interação (adição ou remoção de produtos) há mais de 3 horas.
+```json
+{
+  "id": 1,
+  "products": [],
+  "total_price": 0.0
+}
+```
 
-- Quando este cenário ocorrer, o carrinho deve ser marcado como abandonado.
-- Se o carrinho estiver abandonado há mais de 7 dias, remover o carrinho.
-- Utilize um Job para gerenciar (marcar como abandonado e remover) carrinhos sem interação.
-- Configure a aplicação para executar este Job nos períodos especificados acima.
+**Response (404 Not Found):**
 
-### Detalhes adicionais:
-- O Job deve ser executado regularmente para verificar e marcar carrinhos como abandonados após 3 horas de inatividade.
-- O Job também deve verificar periodicamente e excluir carrinhos que foram marcados como abandonados por mais de 7 dias.
+```json
+{
+  "error": "Product not in cart"
+}
+```
 
-### Como resolver
+**Comportamento:**
 
-#### Implementação
-Você deve usar como base o código disponível nesse repositório e expandi-lo para que atenda as funcionalidade descritas acima.
+- Verifica se o produto existe no carrinho antes de remover
+- Atualiza automaticamente o `total_price` do carrinho
+- Retorna carrinho vazio se for o último produto
 
-Há trechos parcialmente implementados e também sugestões de locais para algumas das funcionalidades sinalizados com um `# TODO`. Você pode segui-los ou fazer da maneira que julgar ser a melhor a ser feita, desde que atenda os contratos de API e funcionalidades descritas.
+## 🔄 Sistema de Carrinhos Abandonados
 
-#### Testes
-Existem testes pendentes, eles estão marcados como <span style="color:green;">Pending</span>, e devem ser implementados para garantir a cobertura dos trechos de código implementados por você.
-Alguns testes já estão passando e outros estão com erro. Com a sua implementação os testes com erro devem passar a funcionar. 
-A adição de novos testes é sempre bem-vinda, mas sem alterar os já implementados.
+### Implementação do Job Automatizado
 
+O sistema implementa um job automatizado (`CleanupAbandonedCartsJob`) que executa a cada hora para gerenciar carrinhos abandonados:
 
-### O que esperamos
-- Implementação dos testes faltantes e de novos testes para os métodos/serviços/entidades criados
-- Construção das 4 rotas solicitadas
-- Implementação de um job para controle dos carrinhos abandonados
+**Cronograma:**
 
+- **3 horas sem interação** → Carrinho marcado como `abandoned`
+- **7 dias abandonado** → Carrinho removido permanentemente
 
-### Itens adicionais / Legais de ter
-- Utilização de factory na construção dos testes
-- Desenvolvimento do docker-compose / dockerização da app
+**Configuração:**
 
-A aplicação já possui um Dockerfile, que define como a aplicação deve ser configurada dentro de um contêiner Docker. No entanto, para completar a dockerização da aplicação, é necessário criar um arquivo `docker-compose.yml`. O arquivo irá definir como os vários serviços da aplicação (por exemplo, aplicação web, banco de dados, etc.) interagem e se comunicam.
+```yaml
+# config/sidekiq_scheduler.yml
+cleanup_abandoned_carts:
+  cron: '0 * * * *' # Executa a cada hora
+  class: CleanupAbandonedCartsJob
+  queue: default
+```
 
-- Adicione tratamento de erros para situações excepcionais válidas, por exemplo: garantir que um produto não possa ter quantidade negativa. 
+**Funcionalidades:**
 
-- Se desejar você pode adicionar a configuração faltante no arquivo `docker-compose.yml` e garantir que a aplicação rode de forma correta utilizando Docker. 
+- Marca carrinhos sem interação há 3+ horas como abandonados
+- Remove carrinhos abandonados há 7+ dias
+- Atualiza `last_interaction_at` a cada operação no carrinho
+- Execução otimizada com `find_each` para grandes volumes
 
-## Informações técnicas
+## 🏗️ Arquitetura e Decisões Técnicas
 
-### Dependências
-- ruby 3.3.1
-- rails 7.1.3.2
-- postgres 16
-- redis 7.0.15
+### Estrutura de Dados
 
-### Como executar o projeto
+**Models Implementados:**
 
-## Executando a app sem o docker
-Dado que todas as as ferramentas estão instaladas e configuradas:
+- `Product`: Produtos disponíveis no catálogo
+- `Cart`: Carrinho de compras por sessão
+- `CartItem`: Itens individuais no carrinho (relacionamento many-to-many)
 
-Instalar as dependências do:
+**Migrações Criadas:**
+
+```ruby
+# 1. Criar CartItems (relacionamento Cart ↔ Product)
+rails g migration CreateCartItems cart:references product:references quantity:integer
+
+# 2. Adicionar status ao Cart
+rails g migration AddStatusToCarts status:string
+
+# 3. Adicionar controle de interação
+rails g migration AddLastInteractionAtToCarts last_interaction_at:datetime
+```
+
+### Decisões de Design
+
+**1. Sistema de Sessão:**
+
+- Carrinho único por sessão (não precisa de `cart_id` na URL)
+- ID do carrinho armazenado em `session[:cart_id]`
+- Criação automática de carrinho quando necessário
+
+**2. Unificação de Endpoints:**
+
+- `POST /cart` e `PATCH /cart/add_item` poderiam ser unificados
+- Mantidos separados conforme especificação do desafio (3 endpoints distintos)
+- `POST /cart` → Adiciona produto (cria se não existir)
+- `PATCH /cart/add_item` → Atualiza quantidade (produto deve existir)
+
+**3. Validações Modernas:**
+
+- Uso de `validates` em vez de `validates_presence_of` (padrão Rails 3.0+)
+- Validações centralizadas nos models
+- Tratamento de erros no `ApplicationController`
+
+**4. Serialização:**
+
+- `Active Model Serializers` para respostas JSON estruturadas
+- Serializers específicos para cada model (`CartSerializer`)
+
+### Qualidade de Código
+
+**RuboCop Configurado:**
+
+- Padronização automática de código
+- Configuração em `.rubocop.yml`
+- Execução: `bundle exec rubocop`
+
+**Testes Abrangentes:**
+
+- RSpec com FactoryBot
+- Cobertura completa de models, controllers e jobs
+- Testes de integração para endpoints
+- Documentação Swagger gerada automaticamente pelos testes
+
+## 🛠️ Informações Técnicas
+
+### Dependências Principais
+
+- **Ruby**: 3.3.1
+- **Rails**: 7.1.3.2
+- **PostgreSQL**: 16
+- **Redis**: 7.0.15
+
+### Dependências Adicionais
+
+- **Sidekiq**: Processamento de jobs em background
+- **Rswag**: Documentação Swagger/OpenAPI
+- **Rack-CORS**: Configuração CORS para Swagger UI
+- **Active Model Serializers**: Serialização JSON
+- **RuboCop**: Linting e padronização de código
+- **FactoryBot**: Criação de dados de teste
+- **RSpec**: Framework de testes
+
+## 🚀 Como Executar o Projeto
+
+### Pré-requisitos
+
+- Ruby 3.3.1
+- PostgreSQL 16
+- Redis 7.0.15
+
+### Instalação e Configuração
+
+1. **Instalar dependências:**
+
 ```bash
 bundle install
 ```
 
-Executar o sidekiq:
+2. **Configurar banco de dados:**
+
+```bash
+rails db:create
+rails db:migrate
+rails db:seed
+```
+
+3. **Executar Sidekiq (em terminal separado):**
+
 ```bash
 bundle exec sidekiq
 ```
 
-Executar projeto:
+4. **Executar aplicação:**
+
 ```bash
 bundle exec rails server
 ```
 
-Executar os testes:
+### Acessando a Aplicação
+
+- **API**: `http://localhost:3000`
+- **Swagger UI**: `http://localhost:3000/api-docs`
+- **Documentação YAML**: `http://localhost:3000/api-docs/v1/swagger.yaml`
+
+### Comandos Úteis
+
+**Executar testes:**
+
 ```bash
 bundle exec rspec
 ```
 
-### Como enviar seu projeto
-Salve seu código em um versionador de código (GitHub, GitLab, Bitbucket) e nos envie o link publico. Se achar necessário, informe no README as instruções para execução ou qualquer outra informação relevante para correção/entendimento da sua solução.
+**Executar RuboCop:**
+
+```bash
+bundle exec rubocop
+```
+
+**Gerar documentação Swagger:**
+
+```bash
+RAILS_ENV=test bundle exec rspec spec/requests/*_swagger_spec.rb --format Rswag::Specs::SwaggerFormatter
+```
+
+**Executar com Docker:**
+
+```bash
+docker-compose up
+```
+
+## 📊 Resumo da Implementação
+
+### ✅ Requisitos Atendidos
+
+- [x] 3 endpoints REST para gerenciamento de carrinho
+- [x] Sistema de carrinhos por sessão
+- [x] Job automatizado para carrinhos abandonados
+- [x] Testes abrangentes com RSpec
+- [x] Documentação Swagger/OpenAPI
+- [x] Dockerização completa
+- [x] Padronização de código com RuboCop
+- [x] Tratamento de erros robusto
+
+### 🎯 Melhorias Implementadas
+
+- **Documentação interativa** com Swagger UI
+- **Sistema de jobs otimizado** para limpeza automática
+- **Validações modernas** seguindo padrões Rails
+- **Serialização estruturada** com Active Model Serializers
+- **Cobertura de testes completa** incluindo jobs e documentação
+- **Configuração CORS** para integração com Swagger UI
+
+### 🔧 Decisões Técnicas
+
+- Mantidos 3 endpoints distintos conforme especificação original
+- Sistema de sessão para carrinhos (sem necessidade de ID na URL)
+- Job único (`CleanupAbandonedCartsJob`) para ambas as operações de limpeza
+- Validações centralizadas nos models
+- Tratamento de erros no `ApplicationController`

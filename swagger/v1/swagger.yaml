@@ -1,0 +1,221 @@
+---
+openapi: 3.0.1
+info:
+  title: Storage V1
+  version: v1
+paths:
+  '/cart':
+    get:
+      summary: Get current cart
+      tags:
+        - Cart
+      responses:
+        '200':
+          description: cart found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  products:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        name:
+                          type: string
+                        quantity:
+                          type: integer
+                        unit_price:
+                          type: number
+                        total_price:
+                          type: number
+                  total_price:
+                    type: number
+    post:
+      summary: Add product to cart
+      tags:
+        - Cart
+      parameters: []
+      responses:
+        '201':
+          description: product added to cart
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  products:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        name:
+                          type: string
+                        quantity:
+                          type: integer
+                        unit_price:
+                          type: number
+                        total_price:
+                          type: number
+                  total_price:
+                    type: number
+        '422':
+          description: invalid parameters
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                product_id:
+                  type: integer
+                quantity:
+                  type: integer
+              required:
+                - product_id
+                - quantity
+  '/cart/add_item':
+    patch:
+      summary: Update product quantity in cart
+      tags:
+        - Cart
+      parameters: []
+      responses:
+        '200':
+          description: product quantity updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  products:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        name:
+                          type: string
+                        quantity:
+                          type: integer
+                        unit_price:
+                          type: number
+                        total_price:
+                          type: number
+                  total_price:
+                    type: number
+        '422':
+          description: invalid parameters
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                product_id:
+                  type: integer
+                quantity:
+                  type: integer
+              required:
+                - product_id
+                - quantity
+  '/cart/{product_id}':
+    delete:
+      summary: Remove product from cart
+      tags:
+        - Cart
+      parameters:
+        - name: product_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: product removed from cart
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  products:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        name:
+                          type: string
+                        quantity:
+                          type: integer
+                        unit_price:
+                          type: number
+                        total_price:
+                          type: number
+                  total_price:
+                    type: number
+        '404':
+          description: product not found in cart
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+  '/products':
+    get:
+      summary: List all products
+      tags:
+        - Products
+      responses:
+        '200':
+          description: products found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    name:
+                      type: string
+                    price:
+                      type: string
+                    created_at:
+                      type: string
+                    updated_at:
+                      type: string
+servers:
+  - url: http://localhost:3000

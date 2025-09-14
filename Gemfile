@@ -12,6 +12,7 @@ gem 'tzinfo-data', platforms: %i[windows jruby]
 gem 'redis', '~> 5.2'
 gem 'sidekiq', '~> 7.2', '>= 7.2.4'
 gem 'sidekiq-scheduler', '~> 5.0', '>= 5.0.3'
+gem 'rack-cors'
 
 gem 'guard'
 gem 'guard-livereload', require: false
@@ -25,4 +26,7 @@ group :development, :test do
   gem 'rubocop-rails', require: false
   gem 'rubocop-rspec', require: false
   gem 'shoulda-matchers', '~> 6.0'
+  gem 'rswag-api'
+  gem 'rswag-ui'
+  gem 'rswag-specs'
 end
