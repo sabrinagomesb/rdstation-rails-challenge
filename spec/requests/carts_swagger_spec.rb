@@ -97,6 +97,22 @@ RSpec.describe 'Carts API', type: :request do
           expect(response.status).to eq(422)
         end
       end
+
+      response '422', 'decimal quantity not allowed' do
+        schema type: :object,
+               properties: {
+                 error: { type: :string }
+               }
+
+        let!(:product) { create(:product, name: 'Test Product', price: 10.99) }
+        let(:cart) { { product_id: product.id, quantity: 6.7 } }
+
+        run_test! do |response|
+          data = JSON.parse(response.body)
+          expect(response.status).to eq(422)
+          expect(data['error']).to eq('Validation failed: Quantity must be a positive integer')
+        end
+      end
     end
   end
 
@@ -135,14 +151,16 @@ RSpec.describe 'Carts API', type: :request do
                  total_price: { type: :number }
                }
 
-        let!(:cart_instance) { create(:cart) }
         let!(:product) { create(:product, name: 'Test Product', price: 10.99) }
-        let!(:cart_item) { create(:cart_item, cart: cart_instance, product: product, quantity: 1) }
         let(:cart) { { product_id: product.id, quantity: 3 } }
+
+        before do
+          post '/cart', params: { product_id: product.id, quantity: 1 }
+        end
 
         run_test! do |response|
           data = JSON.parse(response.body)
-          expect(data['id']).to eq(cart_instance.id)
+          expect(data['id']).to be_present
           expect(data['products']).to be_an(Array)
           expect(data['total_price']).to be_a(Numeric)
         end
@@ -159,6 +177,26 @@ RSpec.describe 'Carts API', type: :request do
 
         run_test! do |response|
           expect(response.status).to eq(422)
+        end
+      end
+
+      response '422', 'decimal quantity not allowed' do
+        schema type: :object,
+               properties: {
+                 error: { type: :string }
+               }
+
+        let!(:product) { create(:product, name: 'Test Product', price: 10.99) }
+        let(:cart) { { product_id: product.id, quantity: 5.5 } }
+
+        before do
+          post '/cart', params: { product_id: product.id, quantity: 1 }
+        end
+
+        run_test! do |response|
+          data = JSON.parse(response.body)
+          expect(response.status).to eq(422)
+          expect(data['error']).to eq('Validation failed: Quantity must be a positive integer')
         end
       end
     end
@@ -191,10 +229,12 @@ RSpec.describe 'Carts API', type: :request do
                  total_price: { type: :number }
                }
 
-        let!(:cart_instance) { create(:cart) }
         let!(:product) { create(:product, name: 'Test Product', price: 10.99) }
-        let!(:cart_item) { create(:cart_item, cart: cart_instance, product: product, quantity: 2) }
         let(:product_id) { product.id }
+
+        before do
+          post '/cart', params: { product_id: product.id, quantity: 2 }
+        end
 
         run_test! do |response|
           data = JSON.parse(response.body)

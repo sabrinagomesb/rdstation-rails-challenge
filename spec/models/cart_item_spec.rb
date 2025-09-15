@@ -7,7 +7,27 @@ RSpec.describe CartItem, type: :model do
   end
 
   describe 'validations' do
-    it { should validate_numericality_of(:quantity).is_greater_than(0) }
+    it { should validate_presence_of(:quantity) }
+
+    it 'validates quantity is a positive integer' do
+      cart = create(:cart)
+      product = create(:product)
+
+      cart_item = build(:cart_item, cart: cart, product: product, quantity: 5)
+      expect(cart_item).to be_valid
+
+      cart_item = build(:cart_item, cart: cart, product: product, quantity: 5.5)
+      expect(cart_item).not_to be_valid
+      expect(cart_item.errors[:quantity]).to include('must be a positive integer')
+
+      cart_item = build(:cart_item, cart: cart, product: product, quantity: -1)
+      expect(cart_item).not_to be_valid
+      expect(cart_item.errors[:quantity]).to include('must be a positive integer')
+
+      cart_item = build(:cart_item, cart: cart, product: product, quantity: 0)
+      expect(cart_item).not_to be_valid
+      expect(cart_item.errors[:quantity]).to include('must be a positive integer')
+    end
   end
 
   describe '#total_price' do

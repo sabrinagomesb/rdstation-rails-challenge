@@ -8,7 +8,7 @@ class CartsController < ApplicationController
 
   # POST /cart
   def create
-    quantity = params[:quantity].to_i
+    quantity = params[:quantity]
 
     cart_item = @cart.cart_items.find_or_initialize_by(product: @product)
     cart_item.quantity = quantity
@@ -21,7 +21,7 @@ class CartsController < ApplicationController
 
   # PATCH /cart/add
   def add_item
-    new_quantity = (params[:quantity] || 1).to_i
+    new_quantity = (params[:quantity] || 1)
 
     item = @cart.cart_items.find_by(product: @product)
     return render_error('Product not in cart', :not_found) unless item
