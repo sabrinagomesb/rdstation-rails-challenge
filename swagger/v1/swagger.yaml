@@ -69,7 +69,7 @@ paths:
                   total_price:
                     type: number
         '422':
-          description: invalid parameters
+          description: decimal quantity not allowed
           content:
             application/json:
               schema:
@@ -124,7 +124,7 @@ paths:
                   total_price:
                     type: number
         '422':
-          description: invalid parameters
+          description: decimal quantity not allowed
           content:
             application/json:
               schema:
