@@ -4,17 +4,31 @@ services:
         environment:
             - POSTGRES_USER=postgres
             - POSTGRES_PASSWORD=password
-            - POSTGRES_DB=myapp_development
+            - POSTGRES_DB=store_development
         ports:
             - '5432:5432'
         volumes:
             - postgres13:/var/lib/postgresql/data
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U postgres"]
+            interval: 5s
+            timeout: 5s
+            retries: 5
+        networks:
+            - app-network
     redis:
         image: redis:7.4.1-alpine
         ports:
             - '6379:6379'
         volumes:
             - redis_data:/data
+        healthcheck:
+            test: ["CMD", "redis-cli", "ping"]
+            interval: 5s
+            timeout: 3s
+            retries: 5
+        networks:
+            - app-network
     web:
         build: .
         command: bundle exec rails server -b 0.0.0.0
@@ -23,10 +37,12 @@ services:
         ports:
             - '3000:3000'
         depends_on:
-            - db
-            - redis
+            db:
+                condition: service_healthy
+            redis:
+                condition: service_healthy
         environment:
-            - DATABASE_URL=postgresql://postgres:password@db:5432/myapp_development
+            - DATABASE_URL=postgresql://postgres:password@db:5432/store_development
             - REDIS_URL=redis://redis:6379/0
             - RAILS_ENV=development
         networks:
@@ -37,10 +53,12 @@ services:
         volumes:
             - .:/rails
         depends_on:
-            - db
-            - redis
+            db:
+                condition: service_healthy
+            redis:
+                condition: service_healthy
         environment:
-            - DATABASE_URL=postgresql://postgres:password@db:5432/myapp_development
+            - DATABASE_URL=postgresql://postgres:password@db:5432/store_development
             - REDIS_URL=redis://redis:6379/0
             - RAILS_ENV=development
         networks:

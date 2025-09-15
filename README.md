@@ -350,7 +350,7 @@ RAILS_ENV=test bundle exec rspec spec/requests/*_swagger_spec.rb --format Rswag:
 **Executar com Docker:**
 
 ```bash
-docker-compose up
+docker compose up
 ```
 
 ## 📊 Resumo da Implementação
